@@ -1,0 +1,61 @@
+schema_version: 1
+
+context:
+  name: pafi
+  version: "0.9.9.1"
+  python_min: "3.10"
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version }}
+
+source:
+  url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/pafi-${{ version }}.tar.gz
+  sha256: de6b28fef00427e5ae6aaf3fd985492306ec7f8357fb1b598956944cbbeb2963
+
+build:
+  number: 1
+  noarch: python
+  script: ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  python:
+    entry_points:
+      - pafi-check-deps = pafi.check_dependencies:main
+
+requirements:
+  host:
+    - python 3.10.*
+    - setuptools >=42
+    - wheel
+    - pip
+  run:
+    - python >=${{ python_min }}
+    - numpy >=1.21
+    - scipy >=1.7
+    - mpi4py >=3.1
+    - matplotlib-base >=3.4
+    - pandas >=1.3
+    - lammps
+
+tests:
+  - python:
+      imports:
+        - pafi
+      pip_check: true
+      python_version: ${{ python_min }}
+  - requirements:
+      run:
+        - pip
+        - python ${{ python_min }}.*
+    script:
+      - pafi-check-deps --help
+
+about:
+  summary: "PAFI: A Python package for the evaluation of free energy barriers beyond Harmonic TST using LAMMPS"
+  license: MIT
+  license_file: LICENSE
+  homepage: https://github.com/tomswinburne/pafi
+
+extra:
+  recipe-maintainers:
+    - tomswinburne
+    - jan-janssen
